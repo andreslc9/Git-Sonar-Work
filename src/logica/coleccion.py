@@ -6,7 +6,6 @@ from src.modelo.interprete import Interprete
 class Coleccion():
 
     def __init__(self):
-        
         Base.metadata.create_all(engine)
 
     def agregar_album(self, titulo, anio, descripcion, medio):
