@@ -152,10 +152,11 @@ class App(QApplication):
         Método para crear una nueva canción. 
         El parámetro id_album indica si la canción está o no asociada a un album
         '''
+        self.window_tittle="Error al guardar canción"
         if nueva_cancion["titulo"] == "" or nueva_cancion["minutos"] == "" or nueva_cancion["segundos"] == "":
             mensaje_error = QMessageBox()
             mensaje_error.setIcon(QMessageBox.Critical)
-            mensaje_error.setWindowTitle("Error al guardar canción")
+            mensaje_error.setWindowTitle(self.window_tittle)
             mensaje_error.setText("Ningún campo debe estar vacio")
             mensaje_error.setStandardButtons(QMessageBox.Ok)
             mensaje_error.exec_()
@@ -163,7 +164,7 @@ class App(QApplication):
             if int(nueva_cancion["minutos"]) == 0 and int(nueva_cancion["segundos"]) < 10:
                 mensaje_error = QMessageBox()
                 mensaje_error.setIcon(QMessageBox.Critical)
-                mensaje_error.setWindowTitle("Error al guardar canción")
+                mensaje_error.setWindowTitle(self.window_tittle)
                 mensaje_error.setText("La duración de la canción debe ser mínimo de 10 sg")
                 mensaje_error.setStandardButtons(QMessageBox.Ok)
                 mensaje_error.exec_()
