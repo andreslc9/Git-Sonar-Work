@@ -69,3 +69,33 @@ class AlbumTestCase(unittest.TestCase):
         self.coleccion.agregar_album("Clara luna-Instrumental", anio_album, descripcion_album, "CD")
         consulta2 = self.coleccion.buscar_albumes_por_titulo("clara luna")
         self.assertLessEqual(len(consulta1), len(consulta2))
+    
+    def test_agregar_album_datos_invalidos(self):
+    # Intentar agregar un álbum con un año inválido
+        titulo_album = self.data_factory.name()
+        anio_album = "año inválido"
+        descripcion_album = self.data_factory.sentence()
+        with self.assertRaises(ValueError):
+            self.coleccion.agregar_album(titulo_album, anio_album, descripcion_album, "CD")
+
+    def test_dar_albumes_por_anio(self):
+        # Agregar álbumes con diferentes años
+        titulo_album1 = self.data_factory.name()
+        anio_album1 = 2020
+        descripcion_album1 = self.data_factory.sentence()
+        self.coleccion.agregar_album(titulo_album1, anio_album1, descripcion_album1, "CD")
+
+        titulo_album2 = self.data_factory.name()
+        anio_album2 = 2021
+        descripcion_album2 = self.data_factory.sentence()
+        self.coleccion.agregar_album(titulo_album2, anio_album2, descripcion_album2, "CD")
+
+        # Obtener álbumes por año
+        albumes_2020 = self.coleccion.dar_albumes_por_anio(2020)
+        albumes_2021 = self.coleccion.dar_albumes_por_anio(2021)
+
+        # Verificar que se obtienen los álbumes correctos
+        self.assertEqual(len(albumes_2020), 1)
+        self.assertEqual(albumes_2020[0].titulo, titulo_album1)
+        self.assertEqual(len(albumes_2021), 1)
+        self.assertEqual(albumes_2021[0].titulo, titulo_album2)
