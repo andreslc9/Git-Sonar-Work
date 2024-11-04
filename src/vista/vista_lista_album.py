@@ -5,6 +5,7 @@ from PyQt5 import QtCore
 
 
 class Ventana_Lista_Album(QWidget):
+    
     '''
     Clase con la lista de albums
     '''
