@@ -222,11 +222,15 @@ class Coleccion():
     def eliminar_interprete(self, interprete_id):
         try:
             interprete = session.query(Interprete).filter(Interprete.id == interprete_id).first()
-            session.delete(interprete)
-            session.commit()
-            return True
-        except SystemExit as e:
-            raise e
+            if interprete is not None:
+                session.delete(interprete)
+                session.commit()
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Ocurrió un error al eliminar el intérprete: {e}")
+            session.rollback()  # Asegúrate de revertir en caso de error
 
     def dar_interpretes(self):
         interpretes = [elem.__dict__ for elem in session.query(Interprete).all()]
