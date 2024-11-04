@@ -11,4 +11,5 @@ if __name__ == '__main__':
     coleccion = Coleccion()
 
     app = ic.App(sys.argv, coleccion)
+    app.config['JWT_SECRET_KEY'] = 'secreto'
     sys.exit(app.exec_())
