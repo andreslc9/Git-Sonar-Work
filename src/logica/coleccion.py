@@ -6,7 +6,7 @@ from src.modelo.interprete import Interprete
 class Coleccion():
 
     def __init__(self):
-        self.admin_password = "supersecret"
+        
         Base.metadata.create_all(engine)
 
     def agregar_album(self, titulo, anio, descripcion, medio):
@@ -169,7 +169,7 @@ class Coleccion():
     def dar_interprete_por_id(self, interprete_id):
         return session.query(Interprete).filter_by(id=interprete_id).first().__dict__
 
-    def dar_canciones_de_album(self, album_id):
+    def dar_canciones_de_album(self):
         return []
 
     def buscar_canciones_por_titulo(self, cancion_titulo):
