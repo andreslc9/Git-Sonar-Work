@@ -225,8 +225,8 @@ class Coleccion():
             session.delete(interprete)
             session.commit()
             return True
-        except:
-            return False
+        except SystemExit as e:
+            raise e
 
     def dar_interpretes(self):
         interpretes = [elem.__dict__ for elem in session.query(Interprete).all()]
@@ -237,8 +237,7 @@ class Coleccion():
             Interprete.nombre.ilike('%{0}%'.format(interprete_nombre))).all()]
         return interpretes
     
-    def process_album_requests():
-    # Infinite loop (reliability issue)
+    def process_album_requests(self):
+
         while True:
             print("Processing album requests...")
-        # Missing a break condition or exit strategy

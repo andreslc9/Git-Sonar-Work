@@ -65,9 +65,6 @@ class Ventana_Inicial(QWidget):
         self.boton_buscar_interprete = QPushButton("Buscar")
         self.boton_buscar_interprete.clicked.connect(self.buscar_interprete)
 
-        #self.boton_ver_interpretes = QPushButton("Ver todos")
-        #self.boton_ver_interpretes.clicked.connect(self.ver_interpretes)
-
         self.etiqueta_resultados = QLabel('Resultados')
         self.etiqueta_resultados.setFont(QFont("Times", weight=QFont.Bold))
 
