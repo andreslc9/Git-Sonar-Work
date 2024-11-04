@@ -7,6 +7,7 @@ class Ventana_Cancion(QWidget):
     '''
     Ventana que permite ver una canción
     '''
+    error_cancion = "Error al guardar canción"  
     def __init__(self, interfaz):
         '''
         Método constructor de la ventana
@@ -199,7 +200,7 @@ class Ventana_Cancion(QWidget):
         Verifica que haya al menos un intérprete en la canción.
         """
         if len(self.interpretes) == 0:
-            self.mostrar_error("Error al guardar canción", "La canción debe tener al menos un intérprete")
+            self.mostrar_error(self.error_cancion, "La canción debe tener al menos un intérprete")
             return False
         return True
 
@@ -237,7 +238,7 @@ class Ventana_Cancion(QWidget):
         Verifica que ningún campo esté vacío.
         """
         if not all([self.cancion_actual["titulo"], self.cancion_actual["minutos"], self.cancion_actual["segundos"]]):
-            self.mostrar_error("Error al guardar canción", "Ningún campo debe estar vacío")
+            self.mostrar_error(self.error_cancion, "Ningún campo debe estar vacío")
             return False
         return True
 
@@ -246,7 +247,7 @@ class Ventana_Cancion(QWidget):
         Verifica que la duración de la canción sea al menos de 10 segundos.
         """
         if int(self.cancion_actual["minutos"]) == 0 and int(self.cancion_actual["segundos"]) < 10:
-            self.mostrar_error("Error al guardar canción", "La duración de la canción debe ser mínimo de 10 sg")
+            self.mostrar_error(self.error_cancion, "La duración de la canción debe ser mínimo de 10 sg")
             return False
         return True
 
