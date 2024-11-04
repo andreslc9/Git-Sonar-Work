@@ -139,3 +139,20 @@ class CancionTestCase(unittest.TestCase):
     def test_dar_cancion_por_id(self):
         consulta = self.coleccion.dar_cancion_por_id(1)
         self.assertEqual(consulta["titulo"], "Baby blues")
+
+    
+    def test_eliminar_cancion(self):
+        titulo = self.data_factory.name()
+        minutos = self.data_factory.pyint(0, 60)
+        segundos = self.data_factory.pyint(0, 60)
+        compositor = self.data_factory.name()
+
+        self.coleccion.agregar_cancion(titulo, minutos, segundos, compositor, -1, [{'nombre': 'Interprete1', 'texto_curiosidades': 'Test'}])
+        cancion = self.session.query(Cancion).filter(Cancion.titulo == titulo).first()
+        self.assertIsNotNone(cancion)
+
+        resultado = self.coleccion.eliminar_cancion(cancion.id)
+        self.assertTrue(resultado)
+        cancion_eliminada = self.session.query(Cancion).filter(Cancion.id == cancion.id).first()
+        self.assertIsNone(cancion_eliminada)
+    

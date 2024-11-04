@@ -69,3 +69,32 @@ class AlbumTestCase(unittest.TestCase):
         self.coleccion.agregar_album("Clara luna-Instrumental", anio_album, descripcion_album, "CD")
         consulta2 = self.coleccion.buscar_albumes_por_titulo("clara luna")
         self.assertLessEqual(len(consulta1), len(consulta2))
+    
+    def test_dar_medios(self):
+        medios_esperados = ['DISCO', 'CASETE', 'CD']
+        medios = self.coleccion.dar_medios()
+        self.assertEqual(medios, medios_esperados, "Los medios devueltos no coinciden con los esperados")
+
+    # Prueba unitaria para la función buscar_albumes_por_titulo
+    def test_buscar_albumes_por_titulo(self):
+        # Agregar álbumes de prueba
+        titulo_album1 = "Álbum Prueba"
+        anio_album1 = 2021
+        descripcion_album1 = "Descripción de prueba"
+        self.coleccion.agregar_album(titulo_album1, anio_album1, descripcion_album1, "CD")
+
+        titulo_album2 = "Álbum Experimental"
+        anio_album2 = 2020
+        descripcion_album2 = "Otro álbum de prueba"
+        self.coleccion.agregar_album(titulo_album2, anio_album2, descripcion_album2, "DISCO")
+
+        # Buscar álbum por un título parcial
+        resultados = self.coleccion.buscar_albumes_por_titulo("Prueba")
+        self.assertEqual(len(resultados), 1)
+        self.assertEqual(resultados[0]['titulo'], titulo_album1, "El título del álbum no coincide con el esperado")
+
+        # Buscar álbum por un título exacto
+        resultados = self.coleccion.buscar_albumes_por_titulo("Álbum Experimental")
+        self.assertEqual(len(resultados), 1)
+        self.assertEqual(resultados[0]['titulo'], titulo_album2, "El título del álbum no coincide con el esperado")
+    
