@@ -222,11 +222,15 @@ class Coleccion():
     def eliminar_interprete(self, interprete_id):
         try:
             interprete = session.query(Interprete).filter(Interprete.id == interprete_id).first()
-            session.delete(interprete)
-            session.commit()
-            return True
-        except:
-            return False
+            if interprete is not None:
+                session.delete(interprete)
+                session.commit()
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(f"Ocurrió un error al eliminar el intérprete: {e}")
+            session.rollback()  # Asegúrate de revertir en caso de error
 
     def dar_interpretes(self):
         interpretes = [elem.__dict__ for elem in session.query(Interprete).all()]
@@ -237,8 +241,7 @@ class Coleccion():
             Interprete.nombre.ilike('%{0}%'.format(interprete_nombre))).all()]
         return interpretes
     
-    def process_album_requests():
-    # Infinite loop (reliability issue)
+    def process_album_requests(self):
+
         while True:
             print("Processing album requests...")
-        # Missing a break condition or exit strategy
