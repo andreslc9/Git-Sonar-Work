@@ -44,16 +44,8 @@ class Coleccion():
             session.delete(album)
             session.commit()
             return True
-        except ValueError as ve:
-            print(f"ValueError: {ve}")  # Manejar excepciones específicas
-            return False
-        except SQLAlchemyError as e:
-            session.rollback()  # Revertir en caso de un error SQL
-            print(f"Ocurrió un error en la base de datos: {e}")
-            return False
-        except Exception as e:
-            print(f"Ocurrió un error inesperado: {e}")
-            return False
+        except SystemExit as e:
+            raise e
 
     def dar_albumes(self):
         albumes = [elem.__dict__ for elem in session.query(Album).all()]
@@ -76,11 +68,13 @@ class Coleccion():
         albumes = [elem.__dict__ for elem in
                    session.query(Album).filter(Album.titulo.ilike('%{0}%'.format(album_titulo))).all()]
         return albumes
-
-    def agregar_cancion(self, titulo, minutos, segundos, compositor, album_id, interpretes):
+    
+    def _obtener_interpretes(self, interpretes):
         if not interpretes:
             return False
-        
+
+    def agregar_cancion(self, titulo, minutos, segundos, compositor, album_id, interpretes):
+        self._obtener_interpretes(interpretes)
         if album_id > 0:
             return self._agregar_cancion_a_album(titulo, minutos, segundos, compositor, album_id, interpretes)
         else:
@@ -150,10 +144,8 @@ class Coleccion():
                 return True
             else:
                 return False
-        except SQLAlchemyError as e:
-            session.rollback()  # Revertir en caso de un error SQL
-            print(f"Ocurrió un error en la base de datos: {e}")  # Registro del error
-            return False
+        except SystemExit as e:
+            raise e
 
     def dar_canciones(self):
         canciones = [elem.__dict__ for elem in session.query(Cancion).all()]
