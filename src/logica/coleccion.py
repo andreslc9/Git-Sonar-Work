@@ -2,7 +2,7 @@ from src.modelo.album import Album, Medio
 from src.modelo.cancion import Cancion
 from src.modelo.declarative_base import engine, Base, session
 from src.modelo.interprete import Interprete
-
+from sqlalchemy.exc import SQLAlchemyError
 
 class Coleccion():
 
@@ -39,10 +39,20 @@ class Coleccion():
     def eliminar_album(self, album_id):
         try:
             album = session.query(Album).filter(Album.id == album_id).first()
+            if album is None:
+                raise ValueError("Álbum no encontrado")  # Lanzar un error específico si el álbum no existe
             session.delete(album)
             session.commit()
             return True
-        except:
+        except ValueError as ve:
+            print(f"ValueError: {ve}")  # Manejar excepciones específicas
+            return False
+        except SQLAlchemyError as e:
+            session.rollback()  # Revertir en caso de un error SQL
+            print(f"Ocurrió un error en la base de datos: {e}")
+            return False
+        except Exception as e:
+            print(f"Ocurrió un error inesperado: {e}")
             return False
 
     def dar_albumes(self):
@@ -68,40 +78,48 @@ class Coleccion():
         return albumes
 
     def agregar_cancion(self, titulo, minutos, segundos, compositor, album_id, interpretes):
-        interpretesCancion = []
-        if len(interpretes) == 0:
+        if not interpretes:
             return False
+        
+        if album_id > 0:
+            return self._agregar_cancion_a_album(titulo, minutos, segundos, compositor, album_id, interpretes)
         else:
-            if album_id > 0:
-                busqueda = session.query(Cancion).filter(Cancion.albumes.any(Album.id.in_([album_id])),
-                                                         Cancion.titulo == titulo).all()
-                if len(busqueda) == 0:
-                    album = session.query(Album).filter(Album.id == album_id).first()
-                    nuevaCancion = Cancion(titulo=titulo, minutos=minutos, segundos=segundos, compositor=compositor,
-                                           albumes=[album])
-                    for item in interpretes:
-                        interprete = Interprete(nombre=item["nombre"], texto_curiosidades=item["texto_curiosidades"],
-                                                cancion=nuevaCancion.id)
-                        session.add(interprete)
-                        interpretesCancion.append(interprete)
-                    nuevaCancion.interpretes = interpretesCancion
-                    session.add(nuevaCancion)
-                    session.commit()
-                    return True
-                else:
-                    return False
-            else:
-                nuevaCancion = Cancion(titulo=titulo, minutos=minutos, segundos=segundos, compositor=compositor)
-                for item in interpretes:
-                    interprete = Interprete(nombre=item["nombre"], texto_curiosidades=item["texto_curiosidades"],
-                                            cancion=nuevaCancion.id)
-                    session.add(interprete)
-                    interpretesCancion.append(interprete)
-                nuevaCancion.interpretes = interpretesCancion
-                session.add(nuevaCancion)
-                session.commit()
-                return True
+            return self._agregar_cancion_sin_album(titulo, minutos, segundos, compositor, interpretes)
 
+    def _agregar_cancion_a_album(self, titulo, minutos, segundos, compositor, album_id, interpretes):
+        busqueda = session.query(Cancion).filter(
+            Cancion.albumes.any(Album.id.in_([album_id])),
+            Cancion.titulo == titulo
+        ).all()
+        
+        if busqueda:
+            return False
+        
+        album = session.query(Album).filter(Album.id == album_id).first()
+        nuevaCancion = Cancion(titulo=titulo, minutos=minutos, segundos=segundos, compositor=compositor, albumes=[album])
+        self._agregar_interpretes_a_cancion(nuevaCancion, interpretes)
+        
+        session.add(nuevaCancion)
+        session.commit()
+        return True
+
+    def _agregar_cancion_sin_album(self, titulo, minutos, segundos, compositor, interpretes):
+        nuevaCancion = Cancion(titulo=titulo, minutos=minutos, segundos=segundos, compositor=compositor)
+        self._agregar_interpretes_a_cancion(nuevaCancion, interpretes)
+        
+        session.add(nuevaCancion)
+        session.commit()
+        return True
+
+    def _agregar_interpretes_a_cancion(self, nuevaCancion, interpretes):
+        for item in interpretes:
+            interprete = Interprete(
+                nombre=item["nombre"],
+                texto_curiosidades=item["texto_curiosidades"],
+                cancion=nuevaCancion.id
+            )
+            session.add(interprete)
+            
     def editar_cancion(self, cancion_id, titulo, minutos, segundos, compositor, interpretes):
         busqueda = session.query(Cancion).filter(Cancion.titulo == titulo, Cancion.id != cancion_id).all()
         if len(busqueda) == 0:
@@ -132,7 +150,9 @@ class Coleccion():
                 return True
             else:
                 return False
-        except:
+        except SQLAlchemyError as e:
+            session.rollback()  # Revertir en caso de un error SQL
+            print(f"Ocurrió un error en la base de datos: {e}")  # Registro del error
             return False
 
     def dar_canciones(self):
