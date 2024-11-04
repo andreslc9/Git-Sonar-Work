@@ -7,6 +7,7 @@ from src.modelo.interprete import Interprete
 class Coleccion():
 
     def __init__(self):
+        self.admin_password = "supersecret"
         Base.metadata.create_all(engine)
 
     def agregar_album(self, titulo, anio, descripcion, medio):
@@ -214,3 +215,9 @@ class Coleccion():
         interpretes = [elem.__dict__ for elem in session.query(Interprete).filter(
             Interprete.nombre.ilike('%{0}%'.format(interprete_nombre))).all()]
         return interpretes
+    
+    def process_album_requests():
+    # Infinite loop (reliability issue)
+        while True:
+            print("Processing album requests...")
+        # Missing a break condition or exit strategy
