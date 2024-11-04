@@ -2,7 +2,6 @@ from src.modelo.album import Album, Medio
 from src.modelo.cancion import Cancion
 from src.modelo.declarative_base import engine, Base, session
 from src.modelo.interprete import Interprete
-from sqlalchemy.exc import SQLAlchemyError
 
 class Coleccion():
 
@@ -40,12 +39,17 @@ class Coleccion():
         try:
             album = session.query(Album).filter(Album.id == album_id).first()
             if album is None:
-                raise ValueError("Álbum no encontrado")  # Lanzar un error específico si el álbum no existe
+                raise ValueError("Álbum no encontrado")
             session.delete(album)
             session.commit()
             return True
-        except SystemExit as e:
-            raise e
+        except ValueError as e:
+            print(e)
+            return False
+        except Exception as e:
+            session.rollback()
+            print(f"Ocurrió un error en la base de datos: {e}")
+            return False
 
     def dar_albumes(self):
         albumes = [elem.__dict__ for elem in session.query(Album).all()]
@@ -68,17 +72,22 @@ class Coleccion():
         albumes = [elem.__dict__ for elem in
                    session.query(Album).filter(Album.titulo.ilike('%{0}%'.format(album_titulo))).all()]
         return albumes
-    
-    def _obtener_interpretes(self, interpretes):
-        if not interpretes:
-            return False
 
+    def _validar_interpretes(self, interpretes):
+        if not interpretes:
+            raise ValueError("Se requiere al menos un intérprete.")
+    
     def agregar_cancion(self, titulo, minutos, segundos, compositor, album_id, interpretes):
-        self._obtener_interpretes(interpretes)
-        if album_id > 0:
-            return self._agregar_cancion_a_album(titulo, minutos, segundos, compositor, album_id, interpretes)
-        else:
-            return self._agregar_cancion_sin_album(titulo, minutos, segundos, compositor, interpretes)
+        try:
+            self._validar_interpretes(interpretes)  # Validar intérpretes
+
+            if album_id > 0:
+                return self._agregar_cancion_a_album(titulo, minutos, segundos, compositor, album_id, interpretes)
+            else:
+                return self._agregar_cancion_sin_album(titulo, minutos, segundos, compositor, interpretes)
+        
+        except ValueError:
+            return False  # Maneja el error y devuelve False si no hay intérpretes
 
     def _agregar_cancion_a_album(self, titulo, minutos, segundos, compositor, album_id, interpretes):
         busqueda = session.query(Cancion).filter(
